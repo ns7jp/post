@@ -1,106 +1,103 @@
-# スタイリッシュ掲示板アプリ
+# スタイリッシュ掲示板
 
-## 概要
-モダンでスタイリッシュなデザインの掲示板アプリケーションです。
+PHP + MySQL で実装したシンプルな掲示板アプリ。ユーザー登録・ログイン・投稿・返信機能を備えています。
 
-## デザイン特徴
+![PHP](https://img.shields.io/badge/PHP-8.x-777BB4?logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white)
+![Security](https://img.shields.io/badge/Security-CSRF%2FXSS%2Fbcrypt-success)
 
-### 🎨 ビジュアルデザイン
-- **グラデーション背景**: 紫系のグラデーションで高級感を演出
-- **カード型レイアウト**: 投稿を見やすいカードデザインで表示
-- **シャドウ効果**: 各要素に美しい影をつけて立体感を表現
-- **アニメーション**: ページ読み込み時やホバー時のスムーズなアニメーション
+🔗 **ライブデモ**: http://shimada.atwebpages.com/post/
 
-### 📱 レスポンシブデザイン
-- スマートフォン、タブレット、PCに完全対応
-- 画面サイズに応じて最適なレイアウトに自動調整
+> ⚠️ **デモサイトは無料ホスティング（HTTP）で運用しています。** 学習目的のため、本番運用はしていません。実際のログイン情報は使用しないでください。
 
-### 🎯 改善点
-1. **スタイリッシュなCSS**: モダンなグラデーション、影、アニメーション
-2. **カード型UI**: 投稿を見やすいカードで表示
-3. **絵文字アイコン**: 各機能に分かりやすい絵文字アイコンを追加
-4. **改善されたフォーム**: 入力しやすいフォームデザイン
-5. **セキュリティ強化**: XSS対策でhtmlspecialchars()を全体に適用
+---
 
-## ファイル構成
+## 主な機能
 
-### メインページ
-- `index.php` - メイン投稿ページ（全投稿表示）
-- `index2.php` - メイン投稿ページ（返信表示版）
-- `login.php` - ログインページ
-- `input.php` - 新規会員登録ページ
-- `reply.php` - 返信ページ
+- **ユーザー認証**：新規登録 / ログイン / ログアウト
+- **投稿・返信**：スレッド作成、ツリー型返信表示
+- **削除機能**：自分の投稿を削除可能
+- **画像アップロード**：プロフィール画像対応
+- **セッション管理**：PHP セッションでログイン状態を保持
 
-### 処理ファイル
-- `check.php` - ログイン認証処理
-- `comfirm.php` - 登録確認ページ
-- `regist.php` - 会員登録処理
-- `write.php` - 新規投稿処理
-- `write2.php` - 返信投稿処理
-- `delete.php` - 投稿削除処理
-- `logout.php` - ログアウト処理
-- `db.php` - データベース接続
+---
 
-### その他
-- `style.css` - スタイリッシュなCSSファイル
-- `error.php` - エラーページ
+## 技術構成
+
+| 項目             | 技術                                     |
+|-----------------|------------------------------------------|
+| バックエンド     | PHP 8.x                                 |
+| データベース     | MySQL（PDO 経由で接続）                  |
+| フロントエンド   | HTML / CSS / JavaScript                  |
+| 認証             | セッション認証 / CSRF 保護 / bcrypt ハッシュ |
+
+---
+
+## セキュリティ実装
+
+| 対策 | 実装内容 |
+|------|--------|
+| **SQLインジェクション** | ユーザー入力を扱うクエリで PDO + プリペアドステートメント |
+| **XSS対策** | `htmlspecialchars()` による出力エスケープ |
+| **CSRF対策** | `random_bytes()` でトークン生成、フォームに hidden で埋め込み、サーバー側で検証 |
+| **パスワード保護** | `password_hash()`（bcrypt）でハッシュ化保存、`password_verify()` で検証 |
+| **セッション管理** | PHP セッションで認証状態を保持 |
+
+---
 
 ## セットアップ
 
-### 1. データベース設定
-`db.php`を開いて、データベース接続情報を設定してください。
+### 1. リポジトリをクローン
+\`\`\`bash
+git clone https://github.com/ns7jp/post.git
+cd post
+\`\`\`
 
-```php
-$db = new PDO('mysql:dbname=mini_bbs;host=127.0.0.1;charset=utf8','root','');
-```
+### 2. DB 設定ファイルを作成
+\`\`\`bash
+cp db.example.php db.php
+\`\`\`
+`db.php` を開き、自身の MySQL 接続情報を記入してください。
 
-### 2. 必要なディレクトリ
-アプリケーションルートに`image`フォルダを作成してください。
+### 3. データベーステーブルを作成
+\`\`\`sql
+CREATE TABLE members (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    picture VARCHAR(255),
+    created DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
-```bash
-mkdir image
-chmod 777 image
-```
+CREATE TABLE posts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    member_id INT NOT NULL,
+    message TEXT NOT NULL,
+    reply_post_id INT DEFAULT 0,
+    created DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE
+);
+\`\`\`
 
-### 3. データベーステーブル
-以下のテーブルが必要です:
+### 4. 起動
+XAMPP 等で `htdocs/post/` に配置するか、ビルトインサーバー：
+\`\`\`bash
+php -S localhost:8000
+\`\`\`
 
-**members テーブル**
-- id (INT, PRIMARY KEY, AUTO_INCREMENT)
-- name (VARCHAR)
-- mail (VARCHAR)
-- pass (VARCHAR)
-- picture (VARCHAR)
+---
 
-**posts テーブル**
-- id (INT, PRIMARY KEY, AUTO_INCREMENT)
-- member_id (INT)
-- message (TEXT)
-- reply_post_id (INT, DEFAULT 0)
-- created (TIMESTAMP)
+## 制作背景
 
-## 使い方
+公共職業訓練「情報処理（Pythonエンジニア）コース」（ISPアカデミー川越校 / 2025年10月〜2026年1月）の学習成果として制作しました。
 
-1. `login.php`にアクセス
-2. 新規登録または既存アカウントでログイン
-3. メインページで投稿を作成
-4. 他の投稿に返信
-5. 自分の投稿を削除
+---
 
-## カラースキーム
+## 著者
 
-- **メインカラー**: #667eea (紫)
-- **セカンダリカラー**: #764ba2 (濃い紫)
-- **アクセントカラー**: #e74c3c (赤)
-- **背景**: グラデーション(#667eea → #764ba2)
+**島田則幸（Noriyuki Shimada）**
 
-## ブラウザ対応
-
-- Chrome (推奨)
-- Firefox
-- Safari
-- Edge
-
-## ライセンス
-
-このプロジェトは自由に使用・改変できます。
+- 🌐 [ポートフォリオサイト](http://shimada.atwebpages.com/pf/)
+- 📂 [ほかの作品](https://github.com/ns7jp/works)
+- 📧 net7jp@gmail.com
