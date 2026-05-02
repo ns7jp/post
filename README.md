@@ -39,7 +39,7 @@
 - `write2.php` - 返信投稿処理
 - `delete.php` - 投稿削除処理
 - `logout.php` - ログアウト処理
-- `db.php` - データベース接続
+- `db.example.php` - データベース接続
 
 ### その他
 - `style.css` - スタイリッシュなCSSファイル
@@ -48,7 +48,7 @@
 ## セットアップ
 
 ### 1. データベース設定
-`db.php`を開いて、データベース接続情報を設定してください。
+`db.example.php`を開いて、データベース接続情報を設定してください。
 
 ```php
 $db = new PDO('mysql:dbname=mini_bbs;host=127.0.0.1;charset=utf8','root','');
