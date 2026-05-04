@@ -59,8 +59,10 @@ $db = new PDO('mysql:dbname=mini_bbs;host=127.0.0.1;charset=utf8','root','');
 
 ```bash
 mkdir image
-chmod 777 image
+chmod 755 image
 ```
+
+画像アップロードなどでWebサーバーからの書き込み権限が必要な場合は、`777` で全ユーザーに開放するのではなく、Webサーバーの実行ユーザー・グループに合わせて所有者やグループ権限を調整してください。
 
 ### 3. データベーステーブル
 以下のテーブルが必要です:
