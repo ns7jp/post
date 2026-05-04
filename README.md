@@ -24,6 +24,12 @@
 
 ## ファイル構成
 
+各ファイルの詳しい役割、読む順番、処理の追い方は [CODE_WALKTHROUGH.md](./CODE_WALKTHROUGH.md) にまとめています。
+
+### 学習ガイド
+- `CODE_WALKTHROUGH.md` - 初学者向けの詳細なコード読解ガイド
+- `DATABASE_SETUP.md` - データベース構造とセットアップの補足ガイド
+
 ### メインページ
 - `index.php` - メイン投稿ページ（全投稿表示）
 - `index2.php` - メイン投稿ページ（返信表示版）
@@ -48,10 +54,10 @@
 ## セットアップ
 
 ### 1. データベース設定
-`db.example.php`を開いて、データベース接続情報を設定してください。
+`db.example.php`をコピーして `db.php` を作成し、データベース接続情報を設定してください。実際の PHP ファイルは `db.php` を読み込みます。
 
 ```php
-$db = new PDO('mysql:dbname=mini_bbs;host=127.0.0.1;charset=utf8','root','');
+$db = new PDO('mysql:dbname=mini_bbs;host=127.0.0.1;charset=utf8mb4','root','');
 ```
 
 ### 2. 必要なディレクトリ
@@ -71,7 +77,7 @@ chmod 755 image
 - id (INT, PRIMARY KEY, AUTO_INCREMENT)
 - name (VARCHAR)
 - mail (VARCHAR)
-- pass (VARCHAR)
+- password (VARCHAR)
 - picture (VARCHAR)
 
 **posts テーブル**

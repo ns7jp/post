@@ -4,7 +4,15 @@
 
 スタイリッシュ掲示板アプリのデータベースをセットアップするためのガイドです。
 
-## 📁 提供されるSQLファイル
+## 🔰 このファイルの読み方
+
+初学者の方は、まず `members` テーブルが「会員情報」、`posts` テーブルが「投稿と返信」を保存する場所だと押さえてください。PHP 側では `db.php` で MySQL に接続し、`check.php` や `regist.php`、`write.php` などから SQL を実行します。
+
+現在のコードでは、登録時に `regist.php` の `password_hash()` でパスワードをハッシュ化し、ログイン時に `check.php` の `password_verify()` で照合します。そのため、会員テーブルのパスワード列は `password` という名前で、ハッシュ化済み文字列を保存する前提です。
+
+## 📁 SQLファイルを使う場合の例
+
+`create_database.sql` や `create_database_secure.sql` を用意している場合は、次のような役割になります。このリポジトリ内に SQL ファイルがない環境では、後述のテーブル構造を参考に phpMyAdmin などで手動作成してください。
 
 ### 1. `create_database.sql` - 基本版
 - シンプルな構造
@@ -61,7 +69,7 @@ mysql -u root -p < create_database_secure.sql
 | id | INT(11) | 会員ID（主キー、自動増分） |
 | name | VARCHAR(100) | ニックネーム |
 | mail | VARCHAR(255) | メールアドレス（ユニーク） |
-| pass | VARCHAR(255) | パスワード |
+| password | VARCHAR(255) | ハッシュ化済みパスワード |
 | picture | VARCHAR(255) | プロフィール画像ファイル名 |
 | created | TIMESTAMP | 登録日時 |
 | updated | TIMESTAMP | 更新日時 |
@@ -88,33 +96,14 @@ mysql -u root -p < create_database_secure.sql
 
 ### パスワードのハッシュ化
 
-現在のコードではパスワードが平文で保存されています。以下のようにPHPコードを修正することを強く推奨します:
+現在のコードは、登録時に `password_hash()`、ログイン時に `password_verify()` を使う構成です。学習のため、対応する処理は次のファイルで確認できます:
 
-**regist.php の修正例:**
-```php
-// 修正前
-$pass = htmlspecialchars($_POST["pass"], ENT_QUOTES);
-
-// 修正後
-$pass = password_hash($_POST["pass"], PASSWORD_DEFAULT);
-```
-
-**check.php の修正例:**
-```php
-// 修正前
-if($kekka2["pass"] == $pass){
-    // ログイン成功
-}
-
-// 修正後
-if(password_verify($pass, $kekka2["pass"])){
-    // ログイン成功
-}
-```
+- `regist.php`: `password_hash($pass, PASSWORD_DEFAULT)` で保存用の文字列を作る
+- `check.php`: `password_verify($pass, $db_pass)` で入力値と保存済みハッシュを照合する
 
 ## 🧪 テストデータ
 
-両方のSQLファイルにはテストデータが含まれています:
+SQLファイルや自作の初期データには、次のようなテストユーザーを用意すると動作確認しやすくなります:
 
 ### テストユーザー
 
@@ -123,6 +112,8 @@ if(password_verify($pass, $kekka2["pass"])){
 | tanaka@example.com | password123 | 田中太郎 |
 | sato@example.com | password456 | 佐藤花子 |
 | suzuki@example.com | password789 | 鈴木一郎 |
+
+テストデータを自分で作る場合も、`password` 列には平文ではなく `password_hash()` 相当のハッシュ化済み文字列を入れる必要があります。
 
 **セキュア版には追加で:**
 - yamada@example.com / password111 / 山田美咲
@@ -186,7 +177,7 @@ LIMIT 5;
 
 ## 📝 db.phpの設定
 
-SQLファイル実行後、`db.php`の接続情報を確認してください:
+テーブル作成後、`db.php`の接続情報を確認してください:
 
 ```php
 <?php
