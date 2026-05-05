@@ -67,6 +67,10 @@ $_SESSION["token"] = $csrf_token;
             <p class="welcome-text">スタイリッシュ掲示板へようこそ</p>
         </header>
 
+        <div class="demo-warning">
+            このデモは学習用です。実際に使っているメールアドレスやパスワードは入力しないでください。
+        </div>
+
         <!-- ログイン用の入力フォーム -->
         <div class="post-form">
             <h2>ログイン情報を入力</h2>

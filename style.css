@@ -140,6 +140,17 @@ h1 {
     font-size: 1.5em;
 }
 
+.demo-warning {
+    background: #fff7ed;
+    border: 2px solid #fb923c;
+    border-radius: 12px;
+    color: #9a3412;
+    font-weight: 600;
+    line-height: 1.7;
+    margin-bottom: 24px;
+    padding: 14px 18px;
+}
+
 /*
  * テキストエリア（複数行入力欄）
  *   ・width: 100% で親要素の幅いっぱいに広げる
